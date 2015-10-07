@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/unirita/gocutoweb/config"
+	"github.com/unirita/gocutoweb/log"
 )
 
 type arguments struct {
@@ -22,11 +23,18 @@ func main() {
 
 	if err := config.Load(args.configPath); err != nil {
 		fmt.Println("Could not load config:", err)
+		return
+	}
+
+	if err := log.Init(); err != nil {
+		fmt.Println("Could not initialize logger:", err)
+		return
 	}
 
 	listenHost := fmt.Sprintf(":%d", config.Server.ListenPort)
 	if err := http.ListenAndServe(listenHost, setupHandler()); err != nil {
 		fmt.Println("Could not start to listen:", err)
+		return
 	}
 }
 
