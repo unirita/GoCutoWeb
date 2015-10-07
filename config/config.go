@@ -4,8 +4,11 @@ package config
 import (
 	"io"
 	"os"
+	"strings"
 
 	"github.com/BurntSushi/toml"
+
+	"github.com/unirita/gocutoweb/pathutil"
 )
 
 // Config holds all config parameter.
@@ -25,6 +28,8 @@ type logSection struct {
 	MaxSizeKB     int    `toml:"max_size_kb"`
 	MaxGeneration int    `toml:"max_generation"`
 }
+
+const tag_CUTOROOT = "<CUTOROOT>"
 
 var Server serverSection
 var Log logSection
@@ -47,8 +52,15 @@ func loadReader(r io.Reader) error {
 		return err
 	}
 
+	replaceCutoroot(c)
+
 	Server = c.Server
 	Log = c.Log
 
 	return nil
+}
+
+func replaceCutoroot(c *Config) {
+	c.Server.MasterPath = strings.Replace(c.Server.MasterPath, tag_CUTOROOT, pathutil.GetRootPath(), -1)
+	c.Log.OutputDir = strings.Replace(c.Log.OutputDir, tag_CUTOROOT, pathutil.GetRootPath(), -1)
 }
