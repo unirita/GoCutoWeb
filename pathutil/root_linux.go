@@ -1,7 +1,6 @@
 package pathutil
 
 import (
-	"fmt"
 	"os"
 )
 
