@@ -16,6 +16,9 @@ output_dir     = "/var/log/gocuto"
 output_level   = "info"
 max_size_kb    = 10240
 max_generation = 2
+
+[jobnet]
+jobnet_dir   = "/usr/local/gocutoweb/jobnet"
 `
 	err := loadReader(strings.NewReader(config))
 	if err != nil {
@@ -38,5 +41,8 @@ max_generation = 2
 	}
 	if Log.MaxGeneration != 2 {
 		t.Errorf("log.max_generation => %d, want %d", Log.MaxGeneration, 2)
+	}
+	if Jobnet.JobnetDir != "/usr/local/gocutoweb/jobnet" {
+		t.Errorf("jobnet.jobnet_dir => %s, want %s", Jobnet.JobnetDir, "/usr/local/gocutoweb/jobnet")
 	}
 }

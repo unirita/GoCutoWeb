@@ -15,6 +15,7 @@ import (
 type Config struct {
 	Server serverSection
 	Log    logSection
+	Jobnet jobnet
 }
 
 type serverSection struct {
@@ -29,10 +30,15 @@ type logSection struct {
 	MaxGeneration int    `toml:"max_generation"`
 }
 
+type jobnet struct {
+	JobnetDir string `toml:"jobnet_dir"`
+}
+
 const tag_CUTOROOT = "<CUTOROOT>"
 
 var Server serverSection
 var Log logSection
+var Jobnet jobnet
 
 // Load loads config file from path, and returns config object as singleton.
 //
@@ -56,6 +62,7 @@ func loadReader(r io.Reader) error {
 
 	Server = c.Server
 	Log = c.Log
+	Jobnet = c.Jobnet
 
 	return nil
 }
