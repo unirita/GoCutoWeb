@@ -1,12 +1,16 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/gorilla/mux"
-	_ "github.com/unirita/gocutoweb/define"
+	"github.com/unirita/gocutoweb/config"
+	"github.com/unirita/gocutoweb/define"
+	"github.com/unirita/gocutoweb/log"
+	"github.com/unirita/gocutoweb/realtimeutil"
 )
 
 const (
@@ -15,6 +19,13 @@ const (
 	methodPut    = "PUT"
 	methodDelete = "DELETE"
 )
+
+const realtimeErrorResult = `{
+    "status":2,
+    "message":"%s",
+    "pid":0,
+	"network":{"instance":0,"name":""}
+}`
 
 func setupHandler() http.Handler {
 	router := mux.NewRouter()
@@ -54,18 +65,26 @@ func showJSONCache(writer http.ResponseWriter, request *http.Request) {
 
 func noticeJobnet(writer http.ResponseWriter, request *http.Request) {
 	jobnetwork := request.FormValue("jobnetwork")
-	//	bucket := request.FormValue("bucket")
-	//	file := request.FormValue("file")
+	bucket := request.FormValue("bucket")
+	file := request.FormValue("file")
 
-	//dynamicJobnetName, err := define.ReplaceJobnetTemplate(jobnetwork, bucket, file)
-	//	if err != nil {
-	//		writer.WriteHeader(http.StatusNotFound)
-	//		return
-	//	}
+	log.Info("Receive trigger jobnetwork[%v] bucket[%v] file[%v]", jobnetwork, bucket, file)
+	// create temp jobnet json-file.
+	dynamicJobnetName, err := define.ReplaceJobnetTemplate(config.Jobnet.JobnetDir, jobnetwork, bucket, file)
+	if err != nil {
+		log.Warn("Jobnetwork[%v] not found.", jobnetwork)
+		writer.WriteHeader(http.StatusNotFound)
+		return
+	}
 
-	//TODO realtime's stdout
-	output := "{\"status\":0,\"message\":\"\",\"pid\":1234,\"network\":{\"instance\":123,\"name\":\"" + jobnetwork + "\"}}"
-
+	// execute realtime utility.
+	url := "http://127.0.0.1:" + string(config.Server.ListenPort) + "/caches/" + dynamicJobnetName
+	c := realtimeutil.NewCommand(dynamicJobnetName, url)
+	if err = c.Run(); err != nil {
+		// realtime utility execute error.
+		c.Result = fmt.Sprintf(realtimeErrorResult, err.Error())
+	}
+	//response
 	writer.Header().Set("Content-Type", "application/json; charset=utf-8")
-	writer.Write([]byte(output))
+	writer.Write([]byte(c.Result))
 }

@@ -8,16 +8,74 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/unirita/gocutoweb/config"
 )
+
+var testJobnetName string = "testjobnet"
+var cacheDir string
+var configFileName string
+
+func init() {
+	cacheDir = filepath.Join(os.TempDir(), "gocuto")
+	os.MkdirAll(cacheDir, 0777)
+	configFileName = filepath.Join(os.TempDir(), "gocuto", "web.ini")
+
+	createConfigFile()
+	createDummyUtil()
+}
+
+func createConfigFile() {
+	configContents := `[server]
+listen_port = 1234
+master_dir = "%v"
+
+[log]
+output_dir     = "%v"
+output_level   = "info"
+max_size_kb    = 10240
+max_generation = 2
+
+[jobnet]
+jobnet_dir    = "%v"
+`
+	f, _ := os.Create(configFileName)
+	dir := strings.Replace(cacheDir, "\\", "/", -1)
+	f.WriteString(fmt.Sprintf(configContents, dir, dir, dir))
+	f.Close()
+}
+
+func createDummyUtil() {
+	var content, dummyUtil string
+
+	if runtime.GOOS == "windows" {
+		content =
+			`@echo off
+echo {"status":0,"message":"","pid":1234,"network":{"instance":123,"name":"%s_20151007123456789"}}
+exit 0
+`
+		dummyUtil = filepath.Join(cacheDir, "realtime.bat")
+	} else {
+		content =
+			`#!/bin/sh
+echo \{\"status\":0,\"message\":\"\",\"pid\":1234,\"network\":\{\"instance\":123,\"name\":\"%s_20151007123456789\"\}\}
+exit 0
+`
+		dummyUtil = filepath.Join(cacheDir, "realtime")
+	}
+	f, _ := os.Create(dummyUtil)
+	f.WriteString(fmt.Sprintf(content, testJobnetName))
+	f.Close()
+	os.Chmod(dummyUtil, 0777)
+}
 
 func TestShowJSONCache(t *testing.T) {
 	server := httptest.NewServer(setupHandler())
 	defer server.Close()
 
-	cacheDir := filepath.Join(os.TempDir(), "gocuto")
-	os.MkdirAll(cacheDir, 0777)
 	cacheFile := filepath.Join(cacheDir, "20151007123456789.json")
 	f, err := os.Create(cacheFile)
 	if err != nil {
@@ -34,6 +92,12 @@ func TestShowJSONCache(t *testing.T) {
 }
 
 func TestNoticeJobnet(t *testing.T) {
+
+	err := config.Load(configFileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	server := httptest.NewServer(setupHandler())
 	defer server.Close()
 
@@ -44,19 +108,25 @@ func TestNoticeJobnet(t *testing.T) {
 	if err != nil {
 		t.Fatalf("File create error: %s", err)
 	}
-	f.WriteString("abcd")
+	flow := `{
+    "flow":"job1->job2->[job3,job4,job5->job6]->job7",
+    "jobs":[
+        {"name":"job2","node":"123.45.67.89","port":1234},
+        {"name":"job7","env":"RESULT=$MJjob3:RC$"}
+    ]
+}`
+	f.WriteString(flow)
 	f.Close()
 	defer os.Remove(cacheFile)
 
 	form := make(url.Values)
-	form.Set("jobnetwork", "testjobnet")
+	form.Set("jobnetwork", testJobnetName)
 	form.Set("bucket", "bucket1")
 	form.Set("file", "testdata")
 
 	output := testPostFormMessages(t, server.URL+"/notice", form)
-	fmt.Println(output)
-	if !strings.Contains(output, "testjobnet") {
-		t.Errorf("output 0size")
+	if !strings.Contains(output, testJobnetName) {
+		t.Errorf("output => %v, want contains(%v)", output, testJobnetName)
 	}
 }
 
