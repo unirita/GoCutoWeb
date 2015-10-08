@@ -19,7 +19,7 @@ type Config struct {
 
 type serverSection struct {
 	ListenPort int    `toml:"listen_port"`
-	MasterPath string `toml:"master_path"`
+	MasterDir  string `toml:"master_dir"`
 }
 
 type logSection struct {
@@ -61,6 +61,6 @@ func loadReader(r io.Reader) error {
 }
 
 func replaceCutoroot(c *Config) {
-	c.Server.MasterPath = strings.Replace(c.Server.MasterPath, tag_CUTOROOT, pathutil.GetRootPath(), -1)
+	c.Server.MasterDir = strings.Replace(c.Server.MasterDir, tag_CUTOROOT, pathutil.GetRootPath(), -1)
 	c.Log.OutputDir = strings.Replace(c.Log.OutputDir, tag_CUTOROOT, pathutil.GetRootPath(), -1)
 }

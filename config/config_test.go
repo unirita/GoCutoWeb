@@ -9,7 +9,7 @@ func TestLoad(t *testing.T) {
 	config := `
 [server]
 listen_port = 1234
-master_path = "/usr/local/gocuto/bin/master"
+master_dir = "/usr/local/gocuto/bin"
 
 [log]
 output_dir     = "/var/log/gocuto"
@@ -24,8 +24,8 @@ max_generation = 2
 	if Server.ListenPort != 1234 {
 		t.Errorf("server.listen_port => %d, want %d", Server.ListenPort, 1234)
 	}
-	if Server.MasterPath != "/usr/local/gocuto/bin/master" {
-		t.Errorf("server.master_path => %s, want %s", Server.MasterPath, "/usr/local/gocuto/bin/master")
+	if Server.MasterDir != "/usr/local/gocuto/bin" {
+		t.Errorf("server.master_path => %s, want %s", Server.MasterDir, "/usr/local/gocuto/bin")
 	}
 	if Log.OutputDir != "/var/log/gocuto" {
 		t.Errorf("log.output_dir => %s, want %s", Log.OutputDir, "/var/log/gocuto")
