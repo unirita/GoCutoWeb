@@ -65,12 +65,11 @@ func showJSONCache(writer http.ResponseWriter, request *http.Request) {
 
 func noticeJobnet(writer http.ResponseWriter, request *http.Request) {
 	jobnetwork := request.FormValue("jobnetwork")
-	bucket := request.FormValue("bucket")
-	file := request.FormValue("file")
+	params := getFormParams(request)
 
-	log.Info("Receive trigger jobnetwork[%v] bucket[%v] file[%v]", jobnetwork, bucket, file)
-	// create temp jobnet json-file.
-	dynamicJobnetName, err := define.ReplaceJobnetTemplate(config.Jobnet.JobnetDir, jobnetwork, bucket, file)
+	log.Info("Receive trigger jobnetwork[%v] params", jobnetwork, params)
+	// create jobnet json-file from template.
+	dynamicJobnetName, err := define.ReplaceJobnetTemplate(config.Jobnet.JobnetDir, jobnetwork, params)
 	if err != nil {
 		log.Warn("Jobnetwork[%v] not found.", jobnetwork)
 		writer.WriteHeader(http.StatusNotFound)
@@ -87,4 +86,16 @@ func noticeJobnet(writer http.ResponseWriter, request *http.Request) {
 	//response
 	writer.Header().Set("Content-Type", "application/json; charset=utf-8")
 	writer.Write([]byte(c.Result))
+}
+
+func getFormParams(req *http.Request) []string {
+	args := make([]string, 0)
+	for i := 1; ; i++ {
+		f := req.FormValue(fmt.Sprintf("param%d", i))
+		if len(f) == 0 {
+			break
+		}
+		args = append(args, f)
+	}
+	return args
 }

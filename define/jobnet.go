@@ -12,8 +12,11 @@ import (
 	"time"
 )
 
+const REP_WEBAPI_PARM1 string = "$WAPARM1"
+const REP_WEBAPI_PARM2 string = "$WAPARM2"
+
 // find jobnet json template and replace.
-func ReplaceJobnetTemplate(path, jobnetName, bucket, fileName string) (string, error) {
+func ReplaceJobnetTemplate(path, jobnetName string, params []string) (string, error) {
 	template, err := os.Open(filepath.Join(path, jobnetName+".json"))
 	if err != nil {
 		return "", err
@@ -25,19 +28,20 @@ func ReplaceJobnetTemplate(path, jobnetName, bucket, fileName string) (string, e
 		return "", err
 	}
 
-	dynamicJobnetName, err := network.replaceAndSave(bucket, fileName)
+	dynamicJobnetName, err := network.replaceAndSave(params)
 	if err != nil {
 		return "", err
 	}
 	return dynamicJobnetName, nil
 }
 
-func (n *Network) replaceAndSave(bucket, fileName string) (string, error) {
-	//TODO replace
+func (n *Network) replaceAndSave(params []string) (string, error) {
 	jobnetJson, err := n.Encode()
 	if err != nil {
 		return "", err
 	}
+
+	jobnetJson = ExpandVariables(jobnetJson, params...)
 	// save
 	dynamicJobnetName := time.Now().Format("20060102150405.000")
 	f, err := os.Create(filepath.Join(os.TempDir(), "gocuto", dynamicJobnetName+".json"))

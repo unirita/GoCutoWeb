@@ -26,6 +26,7 @@ func init() {
 
 	createConfigFile()
 	createDummyUtil()
+	fmt.Println("tempdir = ", cacheDir)
 }
 
 func createConfigFile() {
@@ -111,8 +112,9 @@ func TestNoticeJobnet(t *testing.T) {
 	flow := `{
     "flow":"job1->job2->[job3,job4,job5->job6]->job7",
     "jobs":[
+		{"name":"job1","path":"s3dladapter","param":"-b $WAPARAM1 -f $WAPARAM2"},
         {"name":"job2","node":"123.45.67.89","port":1234},
-        {"name":"job7","env":"RESULT=$MJjob3:RC$"}
+        {"name":"job7","env":"RESULT=$WAPARAM3"}
     ]
 }`
 	f.WriteString(flow)
@@ -121,8 +123,8 @@ func TestNoticeJobnet(t *testing.T) {
 
 	form := make(url.Values)
 	form.Set("jobnetwork", testJobnetName)
-	form.Set("bucket", "bucket1")
-	form.Set("file", "testdata")
+	form.Set("param1", "bucket1")
+	form.Set("param2", "testdata")
 
 	output := testPostFormMessages(t, server.URL+"/notice", form)
 	if !strings.Contains(output, testJobnetName) {
