@@ -77,7 +77,7 @@ func TestShowJSONCache(t *testing.T) {
 	server := httptest.NewServer(setupHandler())
 	defer server.Close()
 
-	cacheFile := filepath.Join(cacheDir, "20151007123456789.json")
+	cacheFile := filepath.Join(cacheDir, "20151007123456.789.json")
 	f, err := os.Create(cacheFile)
 	if err != nil {
 		t.Fatalf("File create error: %s", err)
@@ -86,7 +86,7 @@ func TestShowJSONCache(t *testing.T) {
 	f.Close()
 	defer os.Remove(cacheFile)
 
-	output := testGetMessages(t, server.URL+"/caches/20151007123456789")
+	output := testGetMessages(t, server.URL+"/caches/20151007123456.789")
 	if output != "abcd" {
 		t.Errorf("output => %s, want %s", output, "abcd")
 	}

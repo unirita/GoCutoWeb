@@ -29,8 +29,8 @@ const realtimeErrorResult = `{
 
 func setupHandler() http.Handler {
 	router := mux.NewRouter()
-	router.HandleFunc("/caches/{name:[0-9]{17}}", showJSONCache).Methods(methodGet)
-	router.HandleFunc("/notice", noticeJobnet).Methods(methodPost)
+	router.HandleFunc(`/caches/{name:\d{14}\.\d{3}}`, showJSONCache).Methods(methodGet)
+	router.HandleFunc(`/notice`, noticeJobnet).Methods(methodPost)
 	return router
 }
 
