@@ -19,7 +19,7 @@ const REP_WEBAPI_PARM2 string = "$WAPARM2"
 
 // find jobnet json template and replace.
 func ReplaceJobnetTemplate(path, jobnetName string, params []string) (string, error) {
-	jobnetPath = filepath.Join(path, jobnetName+".json")
+	jobnetPath := filepath.Join(path, jobnetName+".json")
 	log.Debug("Jobnet file path: ", jobnetPath)
 
 	template, err := os.Open(jobnetPath)
