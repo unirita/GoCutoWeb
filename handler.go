@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/unirita/gocutoweb/config"
@@ -77,7 +78,7 @@ func noticeJobnet(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	// execute realtime utility.
-	url := "http://127.0.0.1:" + string(config.Server.ListenPort) + "/caches/" + dynamicJobnetName
+	url := "http://127.0.0.1:" + strconv.Itoa(config.Server.ListenPort) + "/caches/" + dynamicJobnetName
 	c := realtimeutil.NewCommand(dynamicJobnetName, url)
 	if err = c.Run(); err != nil {
 		// realtime utility execute error.
