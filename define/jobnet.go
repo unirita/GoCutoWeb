@@ -49,6 +49,7 @@ func (n *Network) replaceAndSave(params []string) (string, error) {
 	jobnetJson = ExpandVariables(jobnetJson, params...)
 	// save
 	dynamicJobnetName := time.Now().Format("20060102150405.000")
+	os.MkdirAll(filepath.Join(os.TempDir(), "gocuto"), 0777)
 	f, err := os.Create(filepath.Join(os.TempDir(), "gocuto", dynamicJobnetName+".json"))
 	if err != nil {
 		return "", err
