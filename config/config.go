@@ -70,4 +70,5 @@ func loadReader(r io.Reader) error {
 func replaceCutoroot(c *Config) {
 	c.Server.MasterDir = strings.Replace(c.Server.MasterDir, tag_CUTOROOT, pathutil.GetRootPath(), -1)
 	c.Log.OutputDir = strings.Replace(c.Log.OutputDir, tag_CUTOROOT, pathutil.GetRootPath(), -1)
+	c.Jobnet.JobnetDir = strings.Replace(c.Jobnet.JobnetDir, tag_CUTOROOT, pathutil.GetRootPath(), -1)
 }
