@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"github.com/unirita/gocutoweb/log"
 )
 
 const REP_WEBAPI_PARM1 string = "$WAPARM1"
@@ -17,7 +19,10 @@ const REP_WEBAPI_PARM2 string = "$WAPARM2"
 
 // find jobnet json template and replace.
 func ReplaceJobnetTemplate(path, jobnetName string, params []string) (string, error) {
-	template, err := os.Open(filepath.Join(path, jobnetName+".json"))
+	jobnetPath = filepath.Join(path, jobnetName+".json")
+	log.Debug("Jobnet file path: ", jobnetPath)
+
+	template, err := os.Open(jobnetPath)
 	if err != nil {
 		return "", err
 	}

@@ -67,11 +67,11 @@ func noticeJobnet(writer http.ResponseWriter, request *http.Request) {
 	jobnetwork := request.FormValue("jobnetwork")
 	params := getFormParams(request)
 
-	log.Info("Receive trigger jobnetwork[%v] params", jobnetwork, params)
+	log.Info("Receive trigger jobnetwork[", jobnetwork, "] params", params)
 	// create jobnet json-file from template.
 	dynamicJobnetName, err := define.ReplaceJobnetTemplate(config.Jobnet.JobnetDir, jobnetwork, params)
 	if err != nil {
-		log.Warn("Jobnetwork[%v] not found.", jobnetwork)
+		log.Warn("Jobnetwork [", jobnetwork, "] not found. Reason: ", err)
 		writer.WriteHeader(http.StatusNotFound)
 		return
 	}
