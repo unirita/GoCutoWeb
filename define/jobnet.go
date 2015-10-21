@@ -99,20 +99,20 @@ type Network struct {
 }
 
 type Job struct {
-	Name    string
-	Node    string
-	Port    int
-	Path    string
-	Param   string
-	Env     string
-	Work    string
-	WRC     int
-	WPtn    string
-	ERC     int
-	EPtn    string
-	Timeout int
-	SNode   string
-	SPort   int
+	Name    string `json:"name"`
+	Node    string `json:"node"`
+	Port    int    `json:"port"`
+	Path    string `json:"path"`
+	Param   string `json:"param"`
+	Env     string `json:"env"`
+	Work    string `json:"work"`
+	WRC     int    `json:"wrc"`
+	WPtn    string `json:"wptn"`
+	ERC     int    `json:"erc"`
+	EPtn    string `json:"eptn"`
+	Timeout int    `json:"timeout"`
+	SNode   string `json:"snode"`
+	SPort   int    `json:"sport"`
 }
 
 // LoadJobex loads jobex csv which corresponds to name.
