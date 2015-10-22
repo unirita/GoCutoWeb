@@ -25,16 +25,15 @@ func ReplaceJobnetTemplate(path, jobnetName string, params []string) (string, er
 		return "", err
 	}
 
-	cacheName, err := replaceAndSave(string(jsonBuf), params)
+	jobnetJson := ExpandVariables(string(jsonBuf), params...)
+	cacheName, err := saveCacheFile(jobnetJson)
 	if err != nil {
 		return "", err
 	}
 	return cacheName, nil
 }
 
-func replaceAndSave(jobnetJson string, params []string) (string, error) {
-	jobnetJson = ExpandVariables(jobnetJson, params...)
-	// save
+func saveCacheFile(jobnetJson string) (string, error) {
 	cacheName := time.Now().Format("20060102150405.000")
 	os.MkdirAll(filepath.Join(os.TempDir(), "gocuto"), 0777)
 	f, err := os.Create(filepath.Join(os.TempDir(), "gocuto", cacheName+".json"))
