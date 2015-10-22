@@ -70,7 +70,7 @@ func noticeJobnet(writer http.ResponseWriter, request *http.Request) {
 
 	log.Info("Receive trigger jobnetwork[", jobnetwork, "] params", params)
 	// create jobnet json-file from template.
-	dynamicJobnetName, err := define.ReplaceJobnetTemplate(config.Jobnet.JobnetDir, jobnetwork, params)
+	cacheName, err := define.ReplaceJobnetTemplate(config.Jobnet.JobnetDir, jobnetwork, params)
 	if err != nil {
 		log.Warn("Jobnetwork [", jobnetwork, "] not found. Reason: ", err)
 		writer.WriteHeader(http.StatusNotFound)
@@ -78,7 +78,7 @@ func noticeJobnet(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	// execute realtime utility.
-	url := "http://127.0.0.1:" + strconv.Itoa(config.Server.ListenPort) + "/caches/" + dynamicJobnetName
+	url := "http://127.0.0.1:" + strconv.Itoa(config.Server.ListenPort) + "/caches/" + cacheName
 	c := realtimeutil.NewCommand(jobnetwork, url)
 	if err = c.Run(); err != nil {
 		// realtime utility execute error.
