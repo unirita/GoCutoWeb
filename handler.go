@@ -79,7 +79,7 @@ func noticeJobnet(writer http.ResponseWriter, request *http.Request) {
 
 	// execute realtime utility.
 	url := "http://127.0.0.1:" + strconv.Itoa(config.Server.ListenPort) + "/caches/" + dynamicJobnetName
-	c := realtimeutil.NewCommand(dynamicJobnetName, url)
+	c := realtimeutil.NewCommand(jobnetwork, url)
 	if err = c.Run(); err != nil {
 		// realtime utility execute error.
 		c.Result = fmt.Sprintf(realtimeErrorResult, err.Error())
